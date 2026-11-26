@@ -59,3 +59,23 @@ jobs:
           protocol: ftps
           local-dir: ./dist/
           server-dir: ${{ vars.FTP_DIR || 'public_html/' }}
+          # mostra no log a pasta e cada arquivo enviado
+          log-level: verbose
+
+      # O envio pode "dar certo" gravando na pasta errada. Aqui abrimos o site no ar
+      # e conferimos se ele já usa o JS que acabou de ser gerado; se não, o deploy falha.
+      - name: Conferir se o site no ar atualizou
+        if: github.event_name != 'pull_request'
+        env:
+          SITE: ${{ vars.SITE_URL || 'https://www.apantech.com.br' }}
+        run: |
+          esperado=$(grep -oE 'app\.[0-9a-f]{10}\.js' dist/index.html | head -1)
+          echo "Versão gerada: $esperado"
+          for i in 1 2 3 4 5 6; do
+            no_ar=$(curl -fsSL "$SITE/?deploy=$GITHUB_RUN_ID-$i" | grep -oE 'app\.[0-9a-f]{10}\.js' | head -1 || true)
+            echo "Tentativa $i: no ar = ${no_ar:-?}"
+            [ "$no_ar" = "$esperado" ] && echo "Site atualizado." && exit 0
+            sleep 10
+          done
+          echo "::error::O envio terminou, mas $SITE ainda mostra outra versão ($no_ar). Confira o FTP_DIR: os arquivos foram para uma pasta que o site não usa."
+          exit 1
