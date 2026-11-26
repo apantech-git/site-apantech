@@ -1,0 +1,17 @@
+# dependências e arquivos gerados pelo build
+node_modules/
+dist/
+preview/
+.tmp/
+
+# pacotes de upload manual
+*.zip
+
+# sistema e editor
+.DS_Store
+Thumbs.db
+*.log
+
+# segredos locais (nunca versionar)
+.env
+.env.*

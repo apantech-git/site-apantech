@@ -1,0 +1,25 @@
+{
+  "name": "apantech-site",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Site da apantech soluções de tecnologia: React 19 pré-renderizado em HTML estático.",
+  "scripts": {
+    "icons": "node scripts/icons.mjs",
+    "build": "node build.mjs",
+    "preview": "node build.mjs && node scripts/serve.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "better-icons": "^1.0.4",
+    "esbuild": "^0.28.0",
+    "typescript": "^5.8.0"
+  }
+}

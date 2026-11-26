@@ -1,0 +1,61 @@
+# Build e deploy do site da apantech na Hostinger.
+#
+# - Push na main: checa os tipos, gera o site (dist/) e envia por FTP para a Hostinger.
+#   Só os arquivos que mudaram são enviados.
+# - Pull request: só checa e gera o site, sem publicar (serve para revisar antes de entrar na main).
+# - Aba Actions → "Deploy na Hostinger" → "Run workflow": publica na hora, sem precisar de commit.
+#
+# Configuração (Settings → Secrets and variables → Actions):
+#   Secrets:   FTP_SERVER, FTP_USERNAME, FTP_PASSWORD   (hPanel → Arquivos → Contas FTP)
+#   Variable:  FTP_DIR  pasta do site no servidor, terminando em "/" (padrão: public_html/)
+name: Deploy na Hostinger
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# nunca dois deploys ao mesmo tempo; o mais novo espera o anterior terminar
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Checar tipos
+        run: npm run typecheck
+
+      - name: Gerar o site
+        run: npm run build
+
+      - name: Remover arquivos que a Hostinger não usa
+        run: rm -f dist/_headers dist/vercel.json
+
+      - name: Enviar para a Hostinger (FTP)
+        if: github.event_name != 'pull_request'
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          # FTPS (criptografado). Se a Hostinger recusar a conexão, troque para: ftp
+          protocol: ftps
+          local-dir: ./dist/
+          server-dir: ${{ vars.FTP_DIR || 'public_html/' }}
