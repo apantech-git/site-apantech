@@ -2,7 +2,7 @@
 export const empresa = {
   site: "https://www.apantech.com.br", // domínio definitivo, sem barra no final
   nome: "apantech Soluções em Tecnologia",
-  razao: "[Razão social] LTDA",
+  razao: "VINICIUS LUCAS SILVESTRE PROGRAMAS DE COMPUTADOR LTDA",
   cnpj: "62.171.577/0001-13",
   email: "contato@apantech.com.br", // único e-mail do site (rodapé, contato, páginas legais e schema.org)
   telExibir: "(11) 9 8171-4641",
@@ -20,9 +20,9 @@ export const empresa = {
 // ID do Google Analytics 4. Só carrega depois do aceite de cookies.
 export const GA_ID = "G-XXXXXXXXXX";
 
-// Endpoint que recebe o formulário (Formspree, Getform, API própria).
-// Vazio = modo demonstração: valida e vai direto para a página de obrigado.
-export const FORM_ENDPOINT = "";
+// Endpoint que recebe o formulário: public/enviar.php (PHP da Hostinger, envia para empresa.email).
+// Só funciona no servidor; no preview local o envio falha. Vazio = modo demonstração.
+export const FORM_ENDPOINT = "/enviar.php";
 // =====================================================================================
 
 export const whatsUrl =

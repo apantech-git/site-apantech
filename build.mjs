@@ -50,6 +50,8 @@ await build({
 });
 const { render, ROTAS, empresa } = await import(pathToFileURL(join(TMP, "server.mjs")).href);
 const SITE = empresa.site;
+// domínio com www: o .htaccess manda o endereço sem www para ele
+const WWW = (() => { const host = new URL(SITE).host; return host.startsWith("www.") ? { host, apex: host.slice(4) } : null; })();
 
 // caminhos relativos para a prévia
 const rel = (s) =>
@@ -175,7 +177,10 @@ Options -Indexes
 </IfModule>
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteCond %{HTTPS} !=on
+${WWW ? `  # sem www → www, já em HTTPS (um só redirecionamento)
+  RewriteCond %{HTTP_HOST} ^${WWW.apex.replace(/\./g, "\\.")}$ [NC]
+  RewriteRule ^ https://${WWW.host}%{REQUEST_URI} [L,R=301]
+` : ""}  RewriteCond %{HTTPS} !=on
   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 </IfModule>
 `);

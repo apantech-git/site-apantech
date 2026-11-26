@@ -135,7 +135,7 @@ export function Privacidade() {
         <ul><li>Responder seu pedido e preparar a proposta.</li><li>Entender quais páginas do site são úteis e quais precisam melhorar.</li><li>Cumprir obrigações legais e fiscais, se virarmos parceiros.</li></ul>
         <p>Não vendemos dados e não usamos os dados do formulário para publicidade.</p>
         <h2>Com quem compartilhamos</h2>
-        <ul><li>Provedor de hospedagem do site e do e-mail.</li><li>Serviço que recebe o formulário (operador de dados).</li><li>Google, para o Analytics, apenas se você aceitar os cookies.</li></ul>
+        <ul><li>Provedor de hospedagem do site e do e-mail, que também processa o envio do formulário (operador de dados).</li><li>Google, para o Analytics, apenas se você aceitar os cookies.</li></ul>
         <p>Esses fornecedores podem armazenar dados fora do Brasil, com as garantias previstas no art. 33 da LGPD.</p>
         <h2 id="cookies">Cookies</h2>
         <ul>
