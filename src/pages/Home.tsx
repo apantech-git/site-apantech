@@ -1,5 +1,6 @@
 import { Icon } from "../components/Icon";
-import { Accordion, ProjectTabs, type Projeto } from "../components/Interactive";
+import { Accordion, type Projeto } from "../components/Interactive";
+import { ShowReel } from "../components/ShowReel";
 import { whatsUrl } from "../config";
 import { HeroDevices } from "../components/HeroDevices";
 import { IaFlow } from "../components/IaFlow";
@@ -61,9 +62,8 @@ export function Home() {
         <HeroDevices />
       </section>
 
-      <section className="container" aria-labelledby="config-titulo" style={{ paddingBottom: "clamp(56px, 8vw, 104px)" }}>
-        <h2 id="config-titulo" className="sr-only">O que você precisa construir?</h2>
-        <ProjectTabs items={PROJETOS} />
+      <section aria-labelledby="reel-t">
+        <ShowReel />
       </section>
 
       <section className="section section--line" id="processo" aria-labelledby="processo-titulo">

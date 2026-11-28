@@ -61,12 +61,14 @@ type SceneProps = {
   clicks?: number[];             // passos em que o cursor clica
   touch?: boolean;               // dedo em vez de seta
   ativo?: boolean;
+  passo?: number;                // passo controlado por fora (rolagem); sem ele, a cena roda sozinha
   children: (s: number) => ReactNode;
 };
 
-function Scene({ kind, label, dur, aims = {}, clicks = [], touch, ativo = true, children }: SceneProps) {
+function Scene({ kind, label, dur, aims = {}, clicks = [], touch, ativo = true, passo, children }: SceneProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const step = useLoop(dur, ref, ativo);
+  const auto = useLoop(dur, ref, ativo && passo === undefined);
+  const step = passo ?? auto;
   const [ptr, setPtr] = useState<{ x: number; y: number } | null>(null);
 
   // o cursor segue o último alvo até este passo; mede a posição real, então não depende de coordenadas fixas
@@ -133,11 +135,19 @@ function Toast({ on, icon, title, sub }: { on: boolean; icon: Parameters<typeof 
   );
 }
 
+
+// duração de cada passo (ms) quando a cena roda sozinha; o número de passos serve para controlar pela rolagem
+export const DUR_SITE = [700, 800, 500, 1300, 600, 600, 700, 900, 600, 3200];
+export const DUR_SISTEMA = [700, 800, 1000, 1400, 900, 1000, 3200];
+export const DUR_DASHBOARD = [600, 1300, 1300, 900, 1200, 900, 3200];
+export const DUR_APP = [1000, 800, 1000, 1000, 800, 1300, 3200];
+export type SceneCtl = { ativo?: boolean; passo?: number };
+
 /* ---------------------------------------------------------------- site */
-export function SceneSite({ ativo = true }: { ativo?: boolean }) {
+export function SceneSite({ ativo = true, passo }: SceneCtl) {
   return (
-    <Scene kind="site" ativo={ativo} label="Animação: um site de padaria sendo montado; um visitante clica em Encomendar e o pedido chega no e-mail da empresa."
-      dur={[700, 800, 500, 1300, 600, 600, 700, 900, 600, 3200]} aims={{ 7: "cta" }} clicks={[8]}>
+    <Scene kind="site" ativo={ativo} passo={passo} label="Animação: um site de padaria sendo montado; um visitante clica em Encomendar e o pedido chega no e-mail da empresa."
+      dur={DUR_SITE} aims={{ 7: "cta" }} clicks={[8]}>
       {(s) => (
         <>
           <Win url="padariasol.com.br" s={s}>
@@ -183,10 +193,10 @@ const PEDIDOS = [
 ] as const;
 const STATUS = { novo: "Novo", prod: "Em produção", ok: "Entregue" } as const;
 
-export function SceneSistema({ ativo = true }: { ativo?: boolean }) {
+export function SceneSistema({ ativo = true, passo }: SceneCtl) {
   return (
-    <Scene kind="sistema" ativo={ativo} label="Animação: sistema de pedidos; chega um pedido novo, alguém marca outro como entregue e o cliente é avisado pelo WhatsApp."
-      dur={[700, 800, 1000, 1400, 900, 1000, 3200]} aims={{ 4: "status" }} clicks={[5]}>
+    <Scene kind="sistema" ativo={ativo} passo={passo} label="Animação: sistema de pedidos; chega um pedido novo, alguém marca outro como entregue e o cliente é avisado pelo WhatsApp."
+      dur={DUR_SISTEMA} aims={{ 4: "status" }} clicks={[5]}>
       {(s) => (
         <>
           <Win url="app.suaempresa.com.br/pedidos" s={s}>
@@ -236,10 +246,10 @@ export function SceneSistema({ ativo = true }: { ativo?: boolean }) {
 const CANAIS = [["Loja", 82], ["Site", 64], ["WhatsApp", 48], ["Delivery", 30]] as const;
 const LINHA = "M0 62 C12 58 18 46 30 48 S48 60 60 44 S80 26 92 34 S112 40 124 26 S146 16 158 22 S180 10 200 8";
 
-export function SceneDashboard({ ativo = true }: { ativo?: boolean }) {
+export function SceneDashboard({ ativo = true, passo }: SceneCtl) {
   return (
-    <Scene kind="dash" ativo={ativo} label="Animação: dashboard de vendas; os números sobem, o gráfico se desenha e chega um alerta de que as vendas do site subiram."
-      dur={[600, 1300, 1300, 900, 1200, 900, 3200]} aims={{ 5: "ponto" }}>
+    <Scene kind="dash" ativo={ativo} passo={passo} label="Animação: dashboard de vendas; os números sobem, o gráfico se desenha e chega um alerta de que as vendas do site subiram."
+      dur={DUR_DASHBOARD} aims={{ 5: "ponto" }}>
       {(s) => (
         <>
           <Win url="painel.suaempresa.com.br" s={s}>
@@ -290,10 +300,10 @@ export function SceneDashboard({ ativo = true }: { ativo?: boolean }) {
 const DIAS = [["Seg", 24], ["Ter", 25], ["Qua", 26], ["Qui", 27], ["Sex", 28], ["Sáb", 29], ["Dom", 30]] as const;
 const HORAS = ["09:00", "10:30", "13:00", "14:00", "15:30", "17:00"];
 
-export function SceneApp({ ativo = true }: { ativo?: boolean }) {
+export function SceneApp({ ativo = true, passo }: SceneCtl) {
   return (
-    <Scene kind="app" ativo={ativo} label="Animação: aplicativo de agendamento no celular; a cliente escolhe o dia e o horário, confirma e recebe um lembrete."
-      dur={[1000, 800, 1000, 1000, 800, 1300, 3200]} aims={{ 2: "dia", 3: "hora", 4: "confirmar" }} clicks={[2, 3, 4]} touch>
+    <Scene kind="app" ativo={ativo} passo={passo} label="Animação: aplicativo de agendamento no celular; a cliente escolhe o dia e o horário, confirma e recebe um lembrete."
+      dur={DUR_APP} aims={{ 2: "dia", 3: "hora", 4: "confirmar" }} clicks={[2, 3, 4]} touch>
       {(s) => (
         <>
           <span className={w(s, 1, "sa-chip sa-chip--a w--pop")}><i />Android</span>

@@ -1395,3 +1395,112 @@ address { font-style: normal; }
   .form-card__beam, .info-row.is-featured::after, .feature__icon.is-ping::after, .feature__icon.is-ping .icon, .form-progress.is-done .form-progress__bar span { animation: none; }
   .form-card__beam { --beam: 200deg; }
 }
+/* ---------- vídeo da página inicial controlado pela rolagem (ShowReel.tsx) ---------- */
+.reel { position: relative; }
+.reel__in { display: flex; flex-direction: column; align-items: center; gap: 14px; padding-block: clamp(32px, 6vw, 72px); }
+.reel__head { text-align: center; }
+.reel__head .cta-eyebrow { margin-bottom: 10px; }
+.reel__head h2 { font-size: clamp(1.6rem, 1.1rem + 2vw, 2.5rem); }
+.reel__player { width: 100%; display: grid; place-items: center; }
+.reel__screen {
+  position: relative; container-type: inline-size; width: min(100%, 860px); aspect-ratio: 4 / 3; overflow: hidden; isolation: isolate;
+  border: 1px solid var(--border); border-radius: calc(var(--radius) + 10px); box-shadow: var(--shadow-lg), 0 0 90px -30px color-mix(in oklch, var(--brand) 55%, transparent);
+  scale: calc(0.9 + 0.1 * var(--entrada, 1)); transform-origin: 50% 0;
+}
+.reel__screen::before { content: ""; position: absolute; inset: 0; z-index: -1; background: radial-gradient(70% 55% at 100% 0%, var(--brand-soft), transparent 70%), radial-gradient(60% 50% at 0% 100%, var(--brand-soft), transparent 70%); }
+.dark .reel__screen { box-shadow: 0 0 0 1px oklch(1 0 0 / 0.04), 0 28px 56px -16px oklch(0 0 0 / 0.7), 0 0 90px -30px color-mix(in oklch, var(--brand) 50%, transparent); }
+
+/* troca de capítulo: o que passou some "para a frente", o próximo chega de trás */
+.reel__scene { position: absolute; inset: 0; transition: opacity 450ms var(--ease-out), scale 700ms var(--ease-out), filter 450ms var(--ease-out); }
+.reel__scene.is-before { opacity: 0; scale: 1.08; filter: blur(6px); }
+.reel__scene.is-after { opacity: 0; scale: 0.94; filter: blur(6px); }
+.reel__scene:not(.is-active) { pointer-events: none; }
+
+/* cartela de título de cada capítulo */
+.reel__title { position: absolute; inset: 0; z-index: 5; display: grid; place-content: center; justify-items: center; gap: 0.5em; padding: 1em; text-align: center; font-size: 2.3cqi; color: #fff;
+  background: radial-gradient(80% 80% at 50% 30%, var(--brand), var(--brand-solid) 70%); opacity: 0; transition: opacity 420ms var(--ease-out); pointer-events: none; }
+.reel__title.on { opacity: 1; }
+.reel__title > * { translate: 0 0.8em; opacity: 0; transition: translate 650ms var(--spring-selection), opacity 400ms var(--ease-out); }
+.reel__title.on > * { translate: 0 0; opacity: 1; }
+.reel__title.on > :nth-child(2) { transition-delay: 60ms; } .reel__title.on > :nth-child(3) { transition-delay: 120ms; } .reel__title.on > :nth-child(4) { transition-delay: 180ms; }
+.reel__title-num { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 0.95em; padding: 0.2em 0.8em; border-radius: 1em; background: oklch(1 0 0 / 0.16); }
+.reel__title-num i { font-style: normal; opacity: 0.6; }
+.reel__title-icon { display: grid; place-items: center; width: 3.6em; height: 3.6em; margin-top: 0.4em; border-radius: 1em; background: oklch(1 0 0 / 0.16); box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.25); }
+.reel__title-icon .icon { width: 1.8em; height: 1.8em; }
+.reel__title b { font-size: 3.4em; font-weight: 600; letter-spacing: -0.04em; line-height: 1.05; }
+.reel__title small { font-size: 1.25em; opacity: 0.85; }
+
+/* legenda e controles do "player" */
+.reel__caption { min-height: 3.2em; max-width: 46ch; margin: 2px auto 0; text-align: center; font-size: clamp(15px, 0.9rem + 0.3vw, 18px); font-weight: 600; line-height: 1.45; }
+.reel__caption span { display: inline-block; animation: cap-in 450ms var(--ease-out); }
+@keyframes cap-in { from { opacity: 0; translate: 0 6px; filter: blur(3px); } }
+.reel__controls { display: flex; align-items: center; gap: 14px; width: min(100%, 860px); }
+.reel__play { display: grid; place-items: center; flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--brand-solid); color: #fff; box-shadow: 0 0 0 4px var(--brand-soft); }
+.reel__play svg { width: 15px; height: 15px; }
+.reel__tri { fill: currentColor; transition: opacity 200ms; }
+.reel__pause { fill: none; stroke: currentColor; stroke-width: 3.2; stroke-linecap: round; opacity: 0; transition: opacity 200ms; }
+.reel__play.is-playing .reel__tri { opacity: 0; }
+.reel__play.is-playing .reel__pause { opacity: 1; }
+.reel__time { flex: none; font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 13px; font-variant-numeric: tabular-nums; }
+.reel__time i { font-style: normal; color: var(--muted-foreground); }
+.reel__bar { flex: 1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.reel__chap { display: grid; gap: 7px; padding: 6px 0 0; border: 0; background: none; color: var(--muted-foreground); text-align: left; cursor: pointer; font-size: 12.5px; font-weight: 600; transition: color 200ms var(--ease-out); }
+.reel__chap.is-active { color: var(--foreground); }
+.reel__chap.is-active .icon { color: var(--brand-ink); }
+.reel__track { height: 4px; border-radius: 4px; background: var(--border); overflow: hidden; }
+.reel__track > span { display: block; height: 100%; background: linear-gradient(90deg, var(--brand-solid), var(--brand)); transform-origin: left; }
+.reel__chap-name { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.reel__chap-name .icon { width: 14px; height: 14px; }
+@media (hover: hover) and (pointer: fine) { .reel__chap:hover { color: var(--foreground); } }
+
+@media (max-width: 640px) {
+  .reel__chap-name { justify-content: center; }
+  .reel__chap-name { font-size: 0; gap: 0; }
+  .reel__chap-name .icon { width: 15px; height: 15px; }
+  .reel__controls { gap: 10px; }
+  .reel__time i { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reel__screen { scale: none; }
+  .reel__scene.is-before, .reel__scene.is-after { scale: none; filter: none; }
+}
+
+/* quadro 4:3 de cada cena (as cenas são desenhadas nessa proporção; o em delas segue a largura do quadro) */
+.reel__frame { position: absolute; inset: 0; container-type: inline-size; }
+
+/* preso = tela cheia: o bloco alto dá o "tempo" do vídeo; o palco cobre a tela toda (inclusive o header)
+   e se abre de "card" até as bordas enquanto a seção entra (--entrada vai de 0 a 1, e volta a 0 na saída) */
+.reel.is-pinned { height: calc(100svh + var(--n) * 110svh); }
+.reel.is-pinned .reel__stage { --e: var(--entrada, 1); position: sticky; top: 0; z-index: 60; height: 100svh; overflow: hidden; }
+.reel.is-pinned .reel__in { position: static; height: 100%; padding: 0; }
+.reel.is-pinned .reel__player { position: absolute; inset: 0; }
+.reel.is-pinned .reel__screen {
+  position: absolute; inset: 0; width: auto; height: auto; aspect-ratio: auto; scale: none; border: 0; border-radius: 0; background-color: var(--background);
+  clip-path: inset(calc((1 - var(--e)) * 9%) calc((1 - var(--e)) * 12%) round calc((1 - var(--e)) * 32px));
+  box-shadow: none;
+}
+.reel.is-pinned .reel__screen::before { background: radial-gradient(55% 60% at 50% 45%, color-mix(in oklch, var(--brand) 16%, transparent), transparent 75%), radial-gradient(40% 40% at 100% 0%, var(--brand-soft), transparent 70%), radial-gradient(40% 40% at 0% 100%, var(--brand-soft), transparent 70%); }
+/* a cena fica num quadro 4:3 centralizado, entre o título em cima e a legenda/controles embaixo */
+.reel.is-pinned .reel__frame { inset: auto; left: 50%; top: calc(50% + 6px); translate: -50% -50%; width: min(92vw, (100svh - 250px) * 4 / 3); aspect-ratio: 4 / 3; }
+.reel.is-pinned .reel__title { font-size: clamp(11px, 1.5vw, 22px); }
+.reel.is-pinned .reel__head, .reel.is-pinned .reel__caption, .reel.is-pinned .reel__controls { position: absolute; z-index: 6; left: 50%; translate: -50% 0; opacity: clamp(0, (var(--e) - 0.75) * 4, 1); }
+.reel.is-pinned .reel__head { top: clamp(16px, 4vh, 40px); width: min(92vw, 900px); }
+.reel.is-pinned .reel__head h2 { font-size: clamp(1.3rem, 0.9rem + 1.5vw, 2.1rem); }
+.reel.is-pinned .reel__caption { bottom: clamp(62px, 9vh, 92px); width: min(92vw, 720px); max-width: none; min-height: 0; margin: 0; }
+.reel.is-pinned .reel__caption span { padding: 6px 14px; border-radius: 10px; background: color-mix(in oklch, var(--background) 72%, transparent); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+.reel.is-pinned .reel__controls { bottom: clamp(14px, 3vh, 28px); width: min(92vw, 900px); }
+/* o título do capítulo também ocupa a tela toda, por cima de tudo */
+.reel.is-pinned .reel__title { z-index: 7; }
+@media (max-height: 760px) { .reel.is-pinned .reel__head .cta-eyebrow { display: none; } }
+@media (max-width: 640px) {
+  .reel.is-pinned .reel__frame { width: calc(100vw - 24px); top: 48%; }
+  .reel.is-pinned .reel__head { top: 72px; }
+  .reel.is-pinned .reel__caption { bottom: 84px; }
+}
+@media (prefers-reduced-motion: reduce) { .reel.is-pinned .reel__screen { clip-path: none; } }
+.reel.is-pinned .reel__head, .reel.is-pinned .reel__caption { transition: opacity 300ms var(--ease-out); }
+.reel.is-pinned .is-title .reel__head, .reel.is-pinned .is-title .reel__caption { opacity: 0; }
+.reel.is-pinned .is-title .reel__controls { color: #fff; }
+.reel.is-pinned .is-title .reel__time i, .reel.is-pinned .is-title .reel__chap { color: oklch(1 0 0 / 0.75); }
+.reel.is-pinned .is-title .reel__track { background: oklch(1 0 0 / 0.3); }
+.reel.is-pinned .is-title .reel__track > span { background: #fff; }
