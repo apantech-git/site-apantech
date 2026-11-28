@@ -707,15 +707,6 @@ main { overflow-x: clip; }
   .svc-jump__card strong { font-size: 14px; padding-right: 0; }
 }
 
-/* barra flutuante de serviços: embaixo, no centro, para não cobrir títulos; aparece depois dos cartões do topo */
-.svc-nav { position: fixed; z-index: 40; left: 50%; bottom: 20px; max-width: calc(100vw - 32px); translate: -50% 12px; opacity: 0; pointer-events: none; transition: opacity 250ms var(--ease-out), translate 500ms var(--spring-selection); }
-.svc-nav.is-on { opacity: 1; translate: -50% 0; pointer-events: auto; }
-.svc-nav__tabs { padding: 4px; border: 1px solid var(--border); border-radius: 999px; background: color-mix(in oklch, var(--background) 78%, transparent); backdrop-filter: blur(14px) saturate(1.5); -webkit-backdrop-filter: blur(14px) saturate(1.5); box-shadow: var(--shadow-lg); }
-.svc-nav .tab { height: 34px; padding: 0 14px; border-radius: 999px; text-decoration: none; }
-.svc-nav .tabs__highlight { top: 4px; bottom: 4px; border-radius: 999px; opacity: 0; background: var(--brand-soft); box-shadow: inset 0 0 0 1px var(--brand-line); transition: translate 500ms var(--spring-selection), width 500ms var(--spring-selection), opacity 200ms var(--ease-out); }
-.dark .svc-nav .tabs__highlight { background: var(--brand-soft); }
-.svc-nav .tab.is-active { color: var(--brand-ink); }
-@media (max-width: 860px) { .svc-nav { display: none; } }
 .tab.is-active { color: var(--foreground); }
 .tab.is-active .icon { color: var(--brand-ink); }
 
@@ -767,6 +758,73 @@ main { overflow-x: clip; }
 @media (max-width: 860px) {
   .service { grid-template-columns: minmax(0, 1fr); }
   .service:nth-of-type(even) .service__stage { order: 0; }
+}
+
+/* rolagem travada dos serviços (ServicePin em Servicos.tsx): o palco fica preso enquanto o bloco alto passa
+   e os serviços trocam conforme a rolagem; em telas baixas vira a lista normal */
+.svc-steps, .svc-pin__hint { display: none; }
+.svc-slide { border-top: 1px solid var(--border); }
+@media (min-height: 620px) {
+  .svc-pin { position: relative; height: calc(100svh - var(--header-h) + var(--n) * 80svh); }
+  .svc-pin__stage { position: sticky; top: var(--header-h); height: calc(100svh - var(--header-h)); overflow: hidden; border-top: 1px solid var(--border); }
+  .svc-pin__in { position: relative; display: flex; flex-direction: column; height: 100%; padding-block: clamp(14px, 2.6vh, 28px) clamp(16px, 3vh, 36px); }
+
+  .svc-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; flex: none; margin: 0; padding: 0; list-style: none; }
+  .svc-step { display: grid; gap: 9px; width: 100%; padding: 6px 0; border: 0; background: none; color: var(--muted-foreground); font-size: 13px; font-weight: 600; text-align: left; cursor: pointer; transition: color 250ms var(--ease-out); }
+  .svc-step__label { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .svc-step__label b { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 12px; font-weight: 500; }
+  .svc-step__label .icon { width: 15px; height: 15px; transition: color 250ms var(--ease-out), scale 450ms var(--spring-selection); }
+  .svc-step.is-done, .svc-step.is-active { color: var(--foreground); }
+  .svc-step.is-active b, .svc-step.is-active .icon { color: var(--brand-ink); }
+  .svc-step.is-active .icon { scale: 1.15; }
+  .svc-step__track { height: 3px; border-radius: 3px; background: var(--border); overflow: hidden; }
+  .svc-step__fill { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--brand-solid), var(--brand)); transform-origin: left; scale: var(--p, 0) 1; }
+  @media (hover: hover) and (pointer: fine) { .svc-step:hover { color: var(--foreground); } }
+
+  .svc-slides { position: relative; flex: 1; min-height: 0; }
+  .svc-slide { position: absolute; inset: 0; padding-block: clamp(12px, 3vh, 40px) 0; border: 0; scroll-margin-top: 0; }
+  /* entrada e saída: quem já passou sai para cima, quem vem entra de baixo (subindo, o contrário) */
+  .svc-slide .service__copy > *, .svc-slide .service__stage { transition: opacity 380ms var(--ease-out), translate 650ms var(--ease-out), filter 380ms var(--ease-out), scale 650ms var(--ease-out); }
+  .svc-slide.is-after .service__copy > * { opacity: 0; translate: 0 44px; filter: blur(4px); }
+  .svc-slide.is-before .service__copy > * { opacity: 0; translate: 0 -44px; filter: blur(4px); }
+  .svc-slide.is-after .service__stage { opacity: 0; translate: 0 90px; scale: 0.92; }
+  .svc-slide.is-before .service__stage { opacity: 0; translate: 0 -90px; scale: 0.92; }
+  .svc-slide.is-active .service__copy > *:nth-child(1) { transition-delay: 120ms; }
+  .svc-slide.is-active .service__copy > *:nth-child(2) { transition-delay: 170ms; }
+  .svc-slide.is-active .service__copy > *:nth-child(3) { transition-delay: 220ms; }
+  .svc-slide.is-active .service__copy > *:nth-child(4) { transition-delay: 270ms; }
+  .svc-slide.is-active .service__copy > *:nth-child(5) { transition-delay: 320ms; }
+  .svc-slide.is-active .service__copy > *:nth-child(6) { transition-delay: 370ms; }
+  .svc-slide.is-active .service__stage { transition-delay: 80ms; }
+  .svc-slide:not(.is-active) { pointer-events: none; }
+  .svc-slide:not(.is-active) .service__gets li { opacity: 0; scale: 0.85; }
+
+  .svc-pin__hint { position: absolute; left: 50%; bottom: clamp(6px, 1.6vh, 16px); translate: -50% 0; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted-foreground); transition: opacity 300ms var(--ease-out); }
+  .svc-pin__hint .icon { width: 14px; height: 14px; color: var(--brand-ink); animation: hint-bob 1.6s var(--ease-in-out) infinite; }
+  .svc-pin__hint[data-hide] { opacity: 0; }
+  @keyframes hint-bob { 50% { translate: 0 3px; } }
+}
+/* telas de altura média: menos texto para caber no palco */
+@media (min-height: 620px) and (max-height: 780px) and (min-width: 861px) {
+  .svc-slide .service__fit { display: none; }
+  .svc-slide h2 { font-size: clamp(1.75rem, 1.2rem + 1.6vw, 2.25rem); }
+}
+/* celular com a rolagem travada: cena em cima, texto curto embaixo */
+@media (min-height: 620px) and (max-width: 860px) {
+  .svc-steps { gap: 8px; }
+  .svc-step__label span { display: none; }
+  .svc-slide { grid-template-columns: minmax(0, 1fr); align-content: center; gap: clamp(14px, 2.5vh, 24px); }
+  .svc-slide .service__stage, .service:nth-of-type(even).svc-slide .service__stage { order: -1; justify-self: center; width: min(100%, calc(34svh * 4 / 3)); }
+  .svc-slide .service__fit, .svc-slide .service__gets { display: none; }
+  .svc-slide h2 { font-size: 1.6rem; }
+  .svc-slide .service__eyebrow { margin-bottom: 8px; }
+  .svc-slide .service__copy > p { margin-top: 8px; font-size: 15px; }
+  .svc-slide .service__copy .hero__actions { margin-top: 16px; }
+  .svc-pin__hint { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .svc-slide .service__copy > *, .svc-slide .service__stage { translate: none !important; filter: none !important; scale: none !important; }
+  .svc-pin__hint .icon { animation: none; }
 }
 
 /* ---------- cenas animadas dos serviços (ServiceScenes.tsx): tudo em em, escala com a moldura ---------- */
