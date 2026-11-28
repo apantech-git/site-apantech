@@ -14,6 +14,7 @@ import { DUR_APP, DUR_DASHBOARD, DUR_SISTEMA, DUR_SITE, SceneApp, SceneDashboard
 const PIN_MQ = "(min-height: 620px)";
 const TITULO = 0.14;  // parte de cada capítulo ocupada pela cartela de título
 const SEGUNDOS = 48;  // duração "de mentira" mostrada no player
+const CAPA = 0.06;    // começo da rolagem reservado à capa (antes do vídeo começar)
 
 type Capitulo = {
   id: string; nome: string; icon: IconName; frase: string; passos: number;
@@ -60,11 +61,11 @@ export function ShowReel() {
     const w = wrap.current, st = stage.current;
     if (!w || !st) return 0;
     const topo = w.getBoundingClientRect().top + window.scrollY - parseFloat(getComputedStyle(st).top || "0");
-    return Math.round(topo + ((w.offsetHeight - st.offsetHeight) / N) * c + (c ? 2 : 0));
+    return Math.round(topo + (w.offsetHeight - st.offsetHeight) * (CAPA + ((1 - CAPA) * c) / N) + 2);
   };
   const irPara = (c: number) => {
     if (window.matchMedia(PIN_MQ).matches) window.scrollTo({ top: inicio(c), behavior: "smooth" });
-    else setP(c / N + 0.001);
+    else setP(CAPA + ((1 - CAPA) * c) / N + 0.001);
   };
 
   useEffect(() => {
@@ -124,13 +125,16 @@ export function ShowReel() {
     return () => { io.disconnect(); cancelAnimationFrame(raf); };
   }, [preso]);
 
-  const { c, passo, titulo } = quadro(p);
+  // capa: fundo do tema com o título e o play; depois dela, pv é o progresso do vídeo em si
+  const capa = p < CAPA;
+  const pv = Math.max(0, (p - CAPA) / (1 - CAPA));
+  const { c, passo, titulo } = quadro(pv);
   const cap = CAPS[c];
   const legenda = titulo ? cap.frase : [...cap.legendas].reverse().find(([k]) => k <= passo)![1];
 
   return (
     <div className={`reel${preso ? " is-pinned" : ""}`} ref={wrap} style={{ ["--n" as string]: N } as CSSProperties}>
-      <div className={`reel__stage${titulo ? " is-title" : ""}`} ref={stage} data-hide-cta>
+      <div className={`reel__stage${capa ? " is-capa" : titulo ? " is-title" : ""}`} ref={stage} data-hide-cta>
         <div className="container reel__in">
           <div className="reel__head">
             <span className="cta-eyebrow"><span className="sync-dot" />{preso ? "Role a página para assistir" : "Veja em ação"}</span>
@@ -148,8 +152,17 @@ export function ShowReel() {
                   </div>
                 );
               })}
+              <div className={`reel__poster${capa ? " on" : ""}`} aria-hidden={!capa}>
+                <span className="reel__poster-tag"><span className="sync-dot" />Vídeo · {N} capítulos</span>
+                <b className="reel__poster-h">Do site ao app,<br /><span className="accent">veja como fica</span></b>
+                <span className="reel__poster-play"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" /></svg></span>
+                <span className="reel__poster-sub">Role a página para assistir</span>
+                <span className="reel__poster-chaps">
+                  {CAPS.map((k, i) => <span key={k.id}><Icon name={k.icon} />{String(i + 1).padStart(2, "0")} {k.nome}</span>)}
+                </span>
+              </div>
               {CAPS.map((k, i) => (
-                <div key={k.id} className={`reel__title${i === c && titulo ? " on" : ""}`} aria-hidden="true">
+                <div key={k.id} className={`reel__title${!capa && i === c && titulo ? " on" : ""}`} aria-hidden="true">
                   <span className="reel__title-num">{String(i + 1).padStart(2, "0")}<i>/{String(N).padStart(2, "0")}</i></span>
                   <span className="reel__title-icon"><Icon name={k.icon} /></span>
                   <b>{k.nome}</b>
@@ -165,11 +178,11 @@ export function ShowReel() {
             <span className={`reel__play${tocando ? " is-playing" : ""}`} aria-hidden="true">
               <svg viewBox="0 0 24 24"><path className="reel__pause" d="M8 5v14M16 5v14" /><path className="reel__tri" d="M7 4.5v15l12-7.5z" /></svg>
             </span>
-            <span className="reel__time">{tempo(p * SEGUNDOS)} <i>/ {tempo(SEGUNDOS)}</i></span>
+            <span className="reel__time">{tempo(pv * SEGUNDOS)} <i>/ {tempo(SEGUNDOS)}</i></span>
             <div className="reel__bar">
               {CAPS.map((k, i) => (
-                <button key={k.id} type="button" className={`reel__chap${i === c ? " is-active" : ""}`} onClick={() => irPara(i)} aria-label={`Ir para ${k.nome}`}>
-                  <span className="reel__track"><span style={{ scale: `${Math.min(1, Math.max(0, p * N - i))} 1` }} /></span>
+                <button key={k.id} type="button" className={`reel__chap${!capa && i === c ? " is-active" : ""}`} onClick={() => irPara(i)} aria-label={`Ir para ${k.nome}`}>
+                  <span className="reel__track"><span style={{ scale: `${Math.min(1, Math.max(0, pv * N - i))} 1` }} /></span>
                   <span className="reel__chap-name"><Icon name={k.icon} />{k.nome}</span>
                 </button>
               ))}
