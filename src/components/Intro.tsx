@@ -57,9 +57,9 @@ export function Intro() {
 
   return (
     <div className="intro" ref={ref} aria-hidden="true">
-      <span className="intro__word">
+      <span className="intro__word wm">
         {WORD.split("").map((c, i) => (
-          <span key={i} className="intro__letter" style={{ ["--i" as string]: i }}>{c}</span>
+          <span key={i} className={i >= 4 ? "intro__letter wm__tech" : "intro__letter"} style={{ ["--i" as string]: i }}>{c}</span>
         ))}
         <span className="intro__cursor" />
       </span>

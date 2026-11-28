@@ -15,3 +15,6 @@ Thumbs.db
 # segredos locais (nunca versionar)
 .env
 .env.*
+
+# estudos locais (logo etc.), fora do site e do git
+design/

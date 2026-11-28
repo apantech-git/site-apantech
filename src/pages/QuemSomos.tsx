@@ -113,7 +113,7 @@ export function QuemSomos() {
         <div className="container brand-sec">
           <div className="brand-stage dots" data-reveal aria-hidden="true">
             <span className="brand-stage__tag"><span className="sync-dot" />Nova identidade em criação</span>
-            <span className="brand-word">apantech<span className="logo__cursor" /></span>
+            <span className="brand-word wm">apan<span className="wm__tech">tech</span><span className="logo__cursor" /></span>
             <span className="brand-eq">apant<i>+</i>tech</span>
             <span className="brand-stage__grid" />
           </div>

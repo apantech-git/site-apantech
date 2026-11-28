@@ -1,65 +1,7 @@
 import { Icon } from "../components/Icon";
-import { Picture } from "../components/Picture";
 import { ContactForm } from "../components/ContactForm";
-import { CtaCard, IdeaPrompt } from "../components/CtaCard";
-import { PROJETOS } from "./Home";
 import { empresa, enderecoLinha, titular, whatsUrl } from "../config";
 import { emit } from "../lib/utils";
-
-const SERVICOS = [
-  { id: "sites", img: "site", nome: "Sites", alvo: "site",
-    txt: "Site institucional, landing page para campanha ou loja virtual. Entregamos com painel de edição, para você atualizar textos e fotos sem depender da gente.",
-    bom: "empresas que querem receber contatos e pedidos pelo Google e pelas redes sociais.",
-    recebe: "layout próprio, painel de edição, formulário ligado ao seu e-mail, SEO técnico e hospedagem configurada." },
-  { id: "sistemas", img: "sistema", nome: "Sistemas web", alvo: "sistema",
-    txt: "Sistemas que tiram o processo das planilhas: pedidos, estoque, agenda, ordens de serviço, atendimento. Cada pessoa da equipe vê só o que precisa.",
-    bom: "operações que cresceram e hoje dependem de planilhas copiadas e mensagens soltas.",
-    recebe: "sistema no navegador, controle de acesso, relatórios, integrações e treinamento da equipe." },
-  { id: "dashboards", img: "dashboard", nome: "Dashboards", alvo: "dashboard",
-    txt: "Painéis que juntam dados de ERP, planilhas e plataformas de venda e mostram os números que você acompanha toda semana, sem montar relatório à mão.",
-    bom: "gestores que perdem horas consolidando relatórios ou decidem com números de semanas atrás.",
-    recebe: "dashboard com atualização automática, filtros, acesso pelo celular e alertas por e-mail." },
-  { id: "apps", img: "apps", nome: "Aplicativos Android e iOS", alvo: "aplicativo",
-    txt: "Apps para seus clientes agendarem, comprarem e acompanharem pedidos, ou para a equipe de campo registrar visitas e entregas.",
-    bom: "negócios com clientes recorrentes ou equipes que trabalham fora do escritório.",
-    recebe: "app nas duas lojas, painel web para gerenciar o conteúdo, notificações e suporte na aprovação da Apple e do Google." },
-] as const;
-
-export function Servicos() {
-  return (
-    <>
-      <section className="container page-head">
-        <h1>Serviços</h1>
-        <p>Quatro tipos de projeto, sempre feitos do zero para o seu caso. Se o que você precisa não se encaixa em nenhum deles, conte assim mesmo.</p>
-        <div className="hero__actions" data-hide-cta><a className="btn btn--lg" href="/contato.html">Pedir orçamento</a></div>
-      </section>
-      <div className="container">
-        {SERVICOS.map((s, i) => (
-          <section key={s.id} className="service" id={s.id} aria-labelledby={`${s.id}-t`} data-reveal="stagger">
-            <div>
-              <h2 id={`${s.id}-t`}>{s.nome}</h2>
-              <p>{s.txt}</p>
-              <dl><div><dt>Bom para</dt><dd>{s.bom}</dd></div><div><dt>Você recebe</dt><dd>{s.recebe}</dd></div></dl>
-              <div className="hero__actions" style={{ justifyContent: "flex-start", marginTop: 24 }}>
-                <a className="btn btn--outline" href={`/contato.html?tipo=${s.id}`}>Pedir orçamento de {s.alvo}</a>
-              </div>
-            </div>
-            <div className="service__media dots">
-              <Picture name={s.img} alt={PROJETOS.find((p) => p.img === s.img)!.alt} sizes="(max-width: 860px) 94vw, 520px" priority={i === 0} />
-            </div>
-          </section>
-        ))}
-      </div>
-      <section className="container" style={{ paddingBlock: "clamp(24px,4vw,40px) clamp(56px,8vw,104px)" }}>
-        <CtaCard>
-          <h2>Ainda não sabe qual é o seu caso?</h2>
-          <p>Descreva o problema com suas palavras. Na primeira conversa a gente indica o formato mais barato que resolve.</p>
-          <IdeaPrompt />
-        </CtaCard>
-      </section>
-    </>
-  );
-}
 
 export function Contato() {
   const mapa = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(enderecoLinha)}`;

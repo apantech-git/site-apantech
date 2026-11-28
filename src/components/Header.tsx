@@ -5,8 +5,8 @@ import { emit } from "../lib/utils";
 
 export function Logo() {
   return (
-    <a className="logo" href="/" aria-label="apantech, página inicial">
-      apantech<span className="logo__cursor" aria-hidden="true" />
+    <a className="logo wm" href="/" aria-label="apantech, página inicial">
+      apan<span className="wm__tech">tech</span><span className="logo__cursor" aria-hidden="true" />
     </a>
   );
 }

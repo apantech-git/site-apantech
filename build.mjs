@@ -108,6 +108,7 @@ ${r.noindex ? "" : `<link rel="canonical" href="${url}">`}
 <link rel="manifest" href="/site.webmanifest">
 <link rel="preload" href="${manifest["/fonts/inter-400.woff2"]}" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="${manifest["/fonts/inter-600.woff2"]}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="${manifest["/fonts/michroma-400.woff2"]}" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${cssFile}">
 <script>${boot}</script>
 <script type="module" src="${jsFile}"></script>
